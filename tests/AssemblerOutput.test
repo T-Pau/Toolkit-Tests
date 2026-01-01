@@ -1,0 +1,19 @@
+program AssemblerOutputTest.py
+return 0
+file test.s {} <>
+; This file is automatically created by AssemblerOutputTest.py from test.txt.
+; Do not edit.
+
+
+.section test_section
+
+.public object_1 .align $100 {
+.private start_object_1:
+    .data 18
+    .data 4660:2
+    .data $12, $34, $56, $78, $9a, $bc, $de, $f0
+    .data $11, $22
+    .data a, b, c, d, e, f, g, h, i, j
+    .data "test":screen, 0
+}
+end-of-inline-data

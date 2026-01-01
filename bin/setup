@@ -1,0 +1,53 @@
+#!/usr/bin/env python
+
+import os
+import sys
+
+_root_dir = os.path.normpath(os.path.relpath(os.path.dirname(os.path.dirname(__file__)), os.curdir))
+_toolkit_dir = os.path.normpath(os.path.join(_root_dir, "Toolkit"))
+sys.path.append(os.path.join(_root_dir, "python-packages"))
+sys.path.append(os.path.join(_toolkit_dir, "python-packages"))
+
+import Script
+
+class Setup(Script.Script):
+    def __init__(self) -> None:
+        super().__init__("Convert sprite image.")
+        self.arg_parser.add_argument("run_directory", help="Directory to set up to run tests in.")
+        self.arg_parser.add_argument("toolkit_directory", help="Path to Toolkit directory.", default=_toolkit_dir, nargs="?")
+
+    # Get filename of input file.
+    def input_filename(self):
+        return os.path.join(_root_dir, "tests", "nihtest.conf")
+    
+    def output_filename(self):
+        return os.path.join(self.args.run_directory, "nihtest.conf")
+    
+    def execute_sub(self):
+        run_directory = self.args.run_directory
+        test_directory = self.join_paths(_root_dir, "tests")
+        toolkit_directory = self.args.toolkit_directory
+        if not os.path.isabs(run_directory):
+            if not os.path.isabs(test_directory):
+                test_directory = os.path.relpath(test_directory, run_directory)
+            if not os.path.isabs(toolkit_directory):
+                toolkit_directory = os.path.relpath(toolkit_directory, run_directory)
+        else:
+            test_directory = os.path.abspath(test_directory)
+            toolkit_directory = os.path.abspath(toolkit_directory)
+
+        if not os.path.exists(run_directory):
+            os.makedirs(run_directory)
+        with open(self.input_filename(), "r") as f_in:
+                for line in f_in:
+                    line = line.replace("@TEST_DIRECTORY@", test_directory)
+                    line = line.replace("@TOOLKIT_DIRECTORY@", toolkit_directory)
+                    line = line.replace("@RUN_DIRECTORY@", run_directory)
+                    self.output_file().write(line)
+
+    def join_paths(self, base_path: str, relative_path: str) -> str:
+        if os.path.isabs(relative_path):
+            return relative_path
+        return os.path.normpath(os.path.join(base_path, relative_path))
+    
+Setup().run()
