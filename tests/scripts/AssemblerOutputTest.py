@@ -5,7 +5,7 @@ import sys
 import pathlib
 
 _root_dir = pathlib.Path(__file__).resolve().parents[2]
-_toolkit_dir = os.environ["TOOLKIT_DIR"] if "TOOLKIT_DIR" in os.environ else os.path.join(_root_dir, "Toolkit")
+_toolkit_dir = os.environ["TOOLKIT_DIRECTORY"] if "TOOLKIT_DIRECTORY" in os.environ else os.path.join(_root_dir, "Toolkit")
 sys.path.append(os.path.join(_root_dir, "python-packages"))
 sys.path.append(os.path.join(_toolkit_dir, "python-packages"))
 

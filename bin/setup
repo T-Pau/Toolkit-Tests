@@ -36,13 +36,16 @@ class Setup(Script.Script):
             test_directory = os.path.abspath(test_directory)
             toolkit_directory = os.path.abspath(toolkit_directory)
 
+        toolkit_directory_inside_sandbox = os.path.normpath(os.path.join("..", toolkit_directory)) if not os.path.isabs(toolkit_directory) else toolkit_directory
+
         if not os.path.exists(run_directory):
             os.makedirs(run_directory)
         with open(self.input_filename(), "r") as f_in:
                 for line in f_in:
+                    line = line.replace("@RUN_DIRECTORY@", run_directory)
                     line = line.replace("@TEST_DIRECTORY@", test_directory)
                     line = line.replace("@TOOLKIT_DIRECTORY@", toolkit_directory)
-                    line = line.replace("@RUN_DIRECTORY@", run_directory)
+                    line = line.replace("@TOOLKIT_DIRECTORY_FROM_INSIDE_SANDBOX@", toolkit_directory_inside_sandbox)
                     self.output_file().write(line)
 
     def join_paths(self, base_path: str, relative_path: str) -> str:

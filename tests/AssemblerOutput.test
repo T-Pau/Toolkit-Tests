@@ -4,7 +4,6 @@ file test.s {} <>
 ; This file is automatically created by AssemblerOutputTest.py from test.txt.
 ; Do not edit.
 
-
 .section test_section
 
 .public object_1 .align $100 {
