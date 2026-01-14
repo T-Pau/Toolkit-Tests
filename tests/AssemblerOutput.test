@@ -15,4 +15,7 @@ file test.s {} <>
     .data a, b, c, d, e, f, g, h, i, j
     .data "test":screen, 0
 }
+
+object_2 {
+}
 end-of-inline-data
