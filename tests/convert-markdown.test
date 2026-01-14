@@ -1,0 +1,37 @@
+program convert-markdown
+arguments markdown.md
+return 0
+
+file markdown.md <>
+# Markdown File
+
+This is a markdown file with [internal link](internal.md).
+
+Key | Value
+----|-------
+0   | OK
+1   | Error
+end-of-inline-data
+
+file markdown.html {} <>
+<h1>Markdown File</h1>
+<p>This is a markdown file with <a href="internal.html">internal link</a>.</p>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>OK</td>
+</tr>
+<tr>
+<td>1</td>
+<td>Error</td>
+</tr>
+</tbody>
+</table>
+end-of-inline-data

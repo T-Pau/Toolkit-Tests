@@ -1,6 +1,6 @@
 import sys
 import traceback
-from typing import Callable
+from typing import Any, Callable
 
 class Test:
     def __init__(self):
@@ -13,7 +13,7 @@ class Test:
         except Exception as e:
             self.failure(f"Test failed with uncaught exception {type(e)}: '{str(e)}'")
             traceback.print_exc()
-            self.failed += 1
+            sys.exit(1) # TODO: return different code for execution errors
 
         if self.failed > 0:
             sys.exit(1)
@@ -44,3 +44,9 @@ class Test:
                 self.failure(f"{test} raised exception with wrong message: expected '{exception_message}', got '{str(e)}'.")
             else:
                 self.passed += 1
+
+    def equals(self, test: str, result: Any, expected: Any) -> None:
+        if result == expected:
+            self.passed += 1
+        else:
+            self.failure(f"{test} failed: expected '{expected}', got '{result}'.")
