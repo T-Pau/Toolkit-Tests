@@ -1,0 +1,24 @@
+program create-zip
+arguments -o test.zip filelist.txt
+return 0
+
+file filelist.txt <>
+a
+b < a
+dir
+dir2 < dir
+end-of-inline-data
+
+file a <>
+file a
+end-of-inline-data
+
+file b <>
+file b
+end-of-inline-data
+
+file dir/file <>
+file in dir
+end-of-inline-data
+
+file test.zip {} test.zip
