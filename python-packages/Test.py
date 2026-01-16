@@ -49,4 +49,14 @@ class Test:
         if result == expected:
             self.passed += 1
         else:
-            self.failure(f"{test} failed: expected '{expected}', got '{result}'.")
+            self.failure(f"{test} failed: expected {self._pretty(expected)}, got {self._pretty(result)}.")
+        
+    def _pretty(self, value: Any) -> str:
+        if isinstance(value, list):
+            return "[" + ", ".join(self._pretty(v) for v in value) + "]"
+        elif isinstance(value, dict):
+            return "{" + ", ".join(f"{self._pretty(k)}: {self._pretty(v)}" for k, v in value.items()) + "}"
+        elif isinstance(value, bytes):
+            return "b'" + ''.join(f'\\x{b:02x}' for b in value) + "'"
+        else:
+            return str(value)

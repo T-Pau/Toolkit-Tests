@@ -1,0 +1,36 @@
+program convert-charset
+arguments -n test -o test.s -i charset-6.png
+return 0
+
+file charset-6.png charset-6.png
+file test.col <>
+test_color 16 8 w {
+    5 0 4 4 b
+    4 3 6 3 g
+}
+end-of-inline-data
+
+file test.s {} <>
+; This file is automatically created by convert-charset from charset-6.png.
+; Do not edit.
+
+.section data
+
+test {
+    .data $00, $00, $00, $00, $00, $00, $00, $00
+    .data $00, $3c, $66, $7e, $66, $66, $00, $00
+    .data $00, $7c, $66, $7c, $66, $7c, $00, $00
+    .data $00, $3c, $60, $60, $60, $3c, $00, $00
+    .data $00, $3c, $66, $7e, $66, $66, $00, $00
+    .data $00, $00, $00, $00, $00, $00, $00, $00
+}
+
+test_inverted {
+    .data $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff
+    .data $ff, $c3, $99, $81, $99, $99, $ff, $ff
+    .data $ff, $83, $99, $83, $99, $83, $ff, $ff
+    .data $ff, $c3, $9f, $9f, $9f, $c3, $ff, $ff
+    .data $ff, $c3, $99, $81, $99, $99, $ff, $ff
+    .data $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff
+}
+end-of-inline-data
