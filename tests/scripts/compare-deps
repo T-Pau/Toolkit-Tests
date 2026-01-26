@@ -1,0 +1,97 @@
+#!/usr/bin/env python3
+
+import os
+import re
+import sys
+import argparse
+
+argument_parser = argparse.ArgumentParser(description="Compare dependencies file.")
+argument_parser.add_argument("actual", help="Path to dependencies file created by test run.")
+argument_parser.add_argument("expected", help="Path to file describing expected dependencies.", nargs="?")
+argument_parser.add_argument("-v", "--verbose", action="store_true", help="enable verbose output")
+argument_parser.add_argument("--full", action="store_true", help="compare full dependencies, including used Python modules")
+
+args = argument_parser.parse_args()
+
+toolkit_directory = os.environ["TOOLKIT_DIRECTORY"]
+
+expected_file = None
+expected_dependencies = []
+
+def read_description(f):
+    global expected_file
+    global expected_dependencies
+
+    for line in f:
+        line = line.strip()
+        if line and not line.startswith("#"):
+            if not expected_file:
+                expected_file = line
+            else:
+                expected_dependencies.append(line.replace("@TOOLKIT_ROOT@", toolkit_directory))
+    expected_dependencies = sorted(expected_dependencies)
+
+if args.expected is None:
+    read_description(sys.stdin)
+else:
+    with open(args.expected, "r") as f:
+        read_description(f)
+
+actual_file = None
+actual_dependencies = []
+
+with open(args.actual, "r") as f:
+    line = f.readline().strip()
+    colon = line.find(":")
+    if colon == -1:
+        actual_file = ""
+    else:
+        actual_file = line[:colon].strip()
+        line = line[colon + 1:]
+    for dependency in line.strip().split():
+        if args.full or not dependency.endswith(".py"):
+            actual_dependencies.append(dependency)
+    actual_dependencies = sorted(actual_dependencies)
+
+ok = True
+diff = []
+
+if expected_file != actual_file:
+    ok = False
+    diff.append(f"-{expected_file}")
+    diff.append(f"+{actual_file}")
+else:
+    diff.append(f" {expected_file}")
+diff.append("")
+
+actual_index = 0
+expected_index = 0
+
+while actual_index < len(actual_dependencies) or expected_index < len(expected_dependencies):
+    if actual_index < len(actual_dependencies):
+        actual_dep = actual_dependencies[actual_index]
+    else:
+        actual_dep = None
+    if expected_index < len(expected_dependencies):
+        expected_dep = expected_dependencies[expected_index]
+    else:
+        expected_dep = None
+
+    if actual_dep == expected_dep:
+        diff.append(f" {actual_dep}")
+        actual_index += 1
+        expected_index += 1
+    elif expected_dep is None or (actual_dep is not None and actual_dep < expected_dep):
+        ok = False
+        diff.append(f"+{actual_dep}")
+        actual_index += 1
+    else:
+        ok = False
+        diff.append(f"-{expected_dep}")
+        expected_index += 1
+
+if args.verbose or not ok:
+    print("\n".join(diff))
+
+sys.exit(0 if ok else 1)
+

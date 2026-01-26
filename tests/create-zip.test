@@ -1,5 +1,6 @@
 program create-zip
-arguments -o test.zip filelist.txt
+features zipcmp
+arguments -o test.zip -M test.d filelist.txt
 return 0
 
 file filelist.txt <>
@@ -22,3 +23,12 @@ file in dir
 end-of-inline-data
 
 file test.zip {} test.zip
+
+file test.d {} <>
+test.zip
+
+@TOOLKIT_ROOT@/bin/create-zip
+a
+dir
+dir/file
+end-of-inline-data

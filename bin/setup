@@ -8,45 +8,46 @@ _toolkit_dir = os.path.normpath(os.path.join(_root_dir, "Toolkit"))
 sys.path.append(os.path.join(_root_dir, "python-packages"))
 sys.path.append(os.path.join(_toolkit_dir, "python-packages"))
 
+import shutil
+
 import Script
 
 class Setup(Script.Script):
     def __init__(self) -> None:
         super().__init__("Convert sprite image.")
-        self.arg_parser.add_argument("run_directory", help="Directory to set up to run tests in.")
-        self.arg_parser.add_argument("toolkit_directory", help="Path to Toolkit directory.", default=_toolkit_dir, nargs="?")
+        self.arg_parser.add_argument("--testsuite_directory", help="Directory containing test suite (default: derived from script location).", default=_root_dir)
+        self.arg_parser.add_argument("--toolkit_directory", help="Path to Toolkit directory. (default: Toolkit in test directory)", default=_toolkit_dir)
 
     # Get filename of input file.
     def input_filename(self):
-        return os.path.join(_root_dir, "tests", "nihtest.conf")
+        return os.path.join(self.args.testsuite_directory, "tests", "nihtest.conf")
     
     def output_filename(self):
-        return os.path.join(self.args.run_directory, "nihtest.conf")
+        return "nihtest.conf"
     
     def execute_sub(self):
-        run_directory = self.args.run_directory
-        test_directory = self.join_paths(_root_dir, "tests")
+        testsuite_directory = self.args.testsuite_directory
         toolkit_directory = self.args.toolkit_directory
-        if not os.path.isabs(run_directory):
-            if not os.path.isabs(test_directory):
-                test_directory = os.path.relpath(test_directory, run_directory)
-            if not os.path.isabs(toolkit_directory):
-                toolkit_directory = os.path.relpath(toolkit_directory, run_directory)
-        else:
-            test_directory = os.path.abspath(test_directory)
-            toolkit_directory = os.path.abspath(toolkit_directory)
+        if not os.path.isabs(testsuite_directory):
+            testsuite_directory = os.path.relpath(testsuite_directory, ".")
+        if not os.path.isabs(toolkit_directory):
+            toolkit_directory = os.path.relpath(toolkit_directory, ".")
 
-        toolkit_directory_inside_sandbox = os.path.normpath(os.path.join("..", toolkit_directory)) if not os.path.isabs(toolkit_directory) else toolkit_directory
+        test_directory = os.path.join(testsuite_directory, "tests")
+        toolkit_directory_inside_sandbox = self.join_paths("..", toolkit_directory)
 
-        if not os.path.exists(run_directory):
-            os.makedirs(run_directory)
         with open(self.input_filename(), "r") as f_in:
                 for line in f_in:
-                    line = line.replace("@RUN_DIRECTORY@", run_directory)
                     line = line.replace("@TEST_DIRECTORY@", test_directory)
                     line = line.replace("@TOOLKIT_DIRECTORY@", toolkit_directory)
                     line = line.replace("@TOOLKIT_DIRECTORY_FROM_INSIDE_SANDBOX@", toolkit_directory_inside_sandbox)
-                    self.output_file().write(line)
+                    print(line, end="", file=self.output_file())
+        
+        with open("features.h", "w") as f_features:
+            if shutil.which("zipcmp") is not None:
+                f_features.write("#define zipcmp\n")
+            else:
+                f_features.write("#undef zipcmp\n")
 
     def join_paths(self, base_path: str, relative_path: str) -> str:
         if os.path.isabs(relative_path):

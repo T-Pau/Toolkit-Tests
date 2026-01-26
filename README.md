@@ -6,16 +6,21 @@ Tests can be run against the version of Toolkit included in this repository, or 
 
 It requires nihtest an Python to be installed.
 
+To test zip file creation, it needs zipcmp from libzip to be installed.
+
 To test against the included version:
 
 ```sh
+mkdir run
 cd run
+../bin/setup
 nihtest --all
 ```
 
 To test against an external version:
 ```sh
-./bin/setup run-external path/to/external/Toolkit
+mkdir run-external
 cd run-external
+../bin/setup run-external path/to/external/Toolkit
 nihtest --all
 ```
